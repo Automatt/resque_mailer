@@ -17,10 +17,6 @@ module Resque
       end
       
       
-      def self.reset_db_connection_post_fork
-        ActiveRecord::Base.establish_connection if defined?(ActiveRecord)
-      end
-      
     end
 
     module ClassMethods
@@ -41,7 +37,7 @@ module Resque
 
       def perform(action, *args)
         
-        Rails3MailerProxy.reset_db_connection_post_fork
+        ActiveRecord::Base.establish_connection if defined?(ActiveRecord)
         
         Rails3MailerProxy.new(self, action, *args).deliver!
       end
