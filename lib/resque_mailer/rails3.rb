@@ -15,6 +15,12 @@ module Resque
       def deliver!
         @mailer_class.send(:new, @action, *@args).message.deliver
       end
+      
+      
+      def self.reset_db_connection_post_fork
+        ActiveRecord::Base.establish_connection if defined?(ActiveRecord)
+      end
+      
     end
 
     module ClassMethods
@@ -34,8 +40,12 @@ module Resque
       end
 
       def perform(action, *args)
+        
+        Rails3MailerProxy.reset_db_connection_post_fork
+        
         Rails3MailerProxy.new(self, action, *args).deliver!
       end
+
 
     end
   end
